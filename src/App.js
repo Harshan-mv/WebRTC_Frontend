@@ -1,24 +1,50 @@
-import logo from './logo.svg';
-import './App.css';
+// App.js
+import React, { useContext } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { SocketProvider } from "./context/SocketContext";
+import { useAuth } from "./context/AuthContext";
+
+import Home from "./pages/Home";
+import RoomCreate from "./pages/RoomCreate";
+import RoomJoin from "./pages/RoomJoin";
+import RoomPage from "./pages/RoomPage";
+import Lobby from "./pages/Lobby";
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AuthProvider>
+      <SocketProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </SocketProvider>
+    </AuthProvider>
+  );
+}
+
+// Move this to a new component
+function AppRoutes() {
+  const { user, setUser } = useAuth();
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/create" element={<RoomCreate />} />
+      <Route path="/join" element={<RoomJoin />} />
+      <Route path="/room/:roomId" element={<RoomPage />} />
+      <Route path="/lobby" element={<Lobby />} />
+      <Route
+        path="/room/:roomId"
+        element={
+          user ? (
+            <RoomPage />
+          ) : (
+            <div className="p-4 text-center text-gray-600">Loading user info...</div>
+          )
+        }
+      />
+    </Routes>
   );
 }
 
